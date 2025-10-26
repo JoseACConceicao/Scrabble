@@ -1444,3 +1444,5 @@ def gera_numero_aleatorio(estado):
 jog = ('Leticia', '@MEDIO', '@DIFICIL', )
 
 scrabble2(jog, 'vocab25k.txt', 32)
+
+print(f"\nO jogo terminou. Pontuações: {pontuacoes_finais}\n")
