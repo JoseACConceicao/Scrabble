@@ -1,142 +1,144 @@
+"""
+@file scrabble.py
+@author ist1118656 (Jose Conceicao)
+@brief Implementation of the Scrabble game for the FP 25/26 course.
+Includes TADs for Board, Players, Vocabulary, and game logic.
+"""
 
-#region TAD Casa
+#region Square TAD
 
-# O TAD imutável casa é usado para representar uma casa do tabuleiro de Scrabble.
+# The immutable Square TAD represents a single position on the Scrabble board.
+# Internal Representation: A tuple (line, column) for immutability.
 
-# A representação escolhida para este TAD, pir ser imutável é um tuplo
-
-# region Construtor
-def cria_casa(lin, col):
+# region Constructor
+def create_square(line, column):
     """
-    recebe dois inteiros correspondentes à linha, lin, e coluna, col, e
-    devolve a casa correspondente. O construtor verifica a validade dos seus argu-
-    mentos, gerando um ValueError com a mensagem 'cria_casa: argumentos
-    inválidos' caso os seus argumentos não sejam válidos.
-
-    cria_casa: {int, int} -> {tuple}
+    @brief Creates a new board square (square).
+    @param line Line number (1-15).
+    @param column Column number (1-15).
+    @return Tuple (line, column) representing the square.
+    @exception ValueError If the arguments are invalid.
     """
     if (
-        not isinstance(lin, int)
-        or not isinstance(col, int)
-        or not 0 < lin <= 15
-        or not 0 < col <= 15
+        not isinstance(line, int)
+        or not isinstance(column, int)
+        or not 0 < line <= 15
+        or not 0 < column <= 15
     ):
-        raise ValueError("cria_casa: argumentos inválidos")
+        raise ValueError("create_square: invalid arguments")
 
-    return (lin, col)
-
-#endregion
-
-# region Seletores
-def obtem_col(casa):
-    """
-    Recebe uma casa e devolve a coluna asociada à casa
-
-    obtem_coluna: {tuple} -> {int}
-    """
-
-    return casa[1]
-
-
-def obtem_lin(casa):
-    """
-    Recebe uma casa e devolve a linha associada à casa
-
-    obtem_lin: {tuple} -> {int}
-    """
-
-    return casa[0]
+    return (line, column)
 
 #endregion
 
-# region Reconhecedor
-def eh_casa(casa):
+# region Selectors
+def get_column(square):
     """
-    Verifica se o argumento é uma casa, devolvendo True se se o argumento for
-    uma casa ou False caso contrário.
-
-    eh_casa: {tuple} -> {bool}
+    @brief Retrieves the column associated with the square.
+    @param square Square tuple.
+    @return Column index (int).
     """
 
-    # Ser um tuplo, representação escolhida
-    if isinstance(casa, tuple):
-        # Os tipos das coordenadas estarem corretos
-        if isinstance(obtem_col(casa), int) and isinstance(obtem_lin(casa), int):
-            # Estar dentro do tabuleiro
-            if 1 <= obtem_col(casa) <= 15 and 1 <= obtem_lin(casa) <= 15:
+    return square[1]
+
+
+def get_line(square):
+    """
+    @brief Retrieves the line associated with the square.
+    @param square Square tuple.
+    @return Line index (int).
+    """
+
+    return square[0]
+
+#endregion
+
+# region Recognizer
+def is_square(square):
+    """
+    @brief Validates if the argument is a valid Scrabble board square.
+    @param square Argument to check.
+    @return True if valid, False otherwise.
+    """
+
+    # Check if it is a tuple (the chosen representation)
+    if isinstance(square, tuple):
+        # Validate coordinate types
+        if isinstance(get_column(square), int) and isinstance(get_line(square), int):
+            # Check board boundaries
+            if 1 <= get_column(square) <= 15 and 1 <= get_line(square) <= 15:
                 return True
     else:
-        return False  # se nenhuma destas condições se verificar, então não é uma casa
-
+        return False  # If conditions are not met, it is not a valid square
 #endregion
 
-# region Teste
-def casas_iguais(casa1, casa2):
+# region Testing
+def squares_equal(square1, square2):
     """
-    Verifica se as casas fornecidas como argumento são iguais, verificando se ambas
-    as coordenadas são idênticas entre as casas. Devolve True se as casas forem
-    iguais e False caso contrário.
-
-    casa_iguais: {casa, casa} -> {bool}
+    @brief Checks if two squares are identical.
+    @param square1 First square.
+    @param square2 Second square.
+    @return True if equal, False otherwise.
     """
 
     return (
         True
-        if obtem_lin(casa1) == obtem_lin(casa2) and obtem_col(casa1) == obtem_col(casa2)
+        if get_line(square1) == get_line(square2) and get_column(square1) == get_column(square2)
         else False
     )
 
 #endregion
 
-# region Transformadores
-def casa_para_str(casa):
+# region Transformers
+def square_to_str(square):
     """
-    Devolve a cadeia de caracteres que representa a casa fornecida como argumento.
-
-    casas_para_str: {casa} -> {str}
+    @brief Returns the string representation of a square.
+    @param square Square tuple.
+    @return String "(line,column)".
     """
 
-    return str(casa).replace(" ", "")
+    return str(square).replace(" ", "")
 
 
-def str_para_casa(cadeia):
+def str_to_square(text_str):
     """
-    Devolve a casa que é representada pela cadeia de carecters fornecida como argumento
-
-    str_para_casa: {str} -> {tuple}
+    @brief Converts a string representation back to a square tuple.
+    @param text_str String representation "(line,column)".
+    @return Square tuple (line, column).
     """
-    cadeia_coordenadas_casa = ""
-    for caracter in cadeia:
-        if not caracter in {"(", ")", " "}:
-            cadeia_coordenadas_casa += "".join(caracter)
-    coordenadas = cadeia_coordenadas_casa.split(",")
+    text_str_coordenadas_square = ""
+    for char in text_str:
+        if not char in {"(", ")", " "}:
+            text_str_coordenadas_square += "".join(char)
+    coordenadas = text_str_coordenadas_square.split(",")
 
-    casa = cria_casa(int(coordenadas[0]), int(coordenadas[1]))
+    square = create_square(int(coordenadas[0]), int(coordenadas[1]))
 
-    return casa
+    return square
 
 #endregion
 
-# region Funções de alto Nível
-def incrementa_casa(c, d, s):
+# region High-Level Functions
+def increment_square(c, d, s):
     """
-    Devolve a casa dum tabuleiro de Scrabble a seguir à casa fornecida como argumento
-    na direção indicada e à distância s.
-
-    incrementa_casa: {casa, str, int} -> {casa}
+    @brief Returns the next square in a given direction and distance.
+    @param c Starting square.
+    @param d Direction ("V" for Vertical, "H" for Horizontal).
+    @param s Distance to move.
+    @return Next square tuple, or the original if move is invalid.
     """
 
-    coluna_original = obtem_col(c)
-    linha_original = obtem_lin(c)
+    column_original = get_column(c)
+    line_original = get_line(c)
 
     if d == "V":
-        linha = linha_original + s
-        coluna = coluna_original
+        line = line_original + s
+        column = column_original
     if d == "H":
-        linha = linha_original
-        coluna = coluna_original + s
-    if 1 <= linha <= 15 and 1 <= coluna <= 15:
-        return cria_casa(linha, coluna)
+        line = line_original
+        column = column_original + s
+    if 1 <= line <= 15 and 1 <= column <= 15:
+        return create_square(line, column)
     else:
         return c
 
@@ -145,179 +147,174 @@ def incrementa_casa(c, d, s):
 #endregion
 
 
-#region TAD Jogador
+#region Player TAD
 
-# O TAD jogador ´e usado para representar um jogador do jogo Scrabble, a sua pontua¸c˜ao
-# e letras. Os jogadores podem ser humanos ou agentes.
+# The Player TAD represents a Scrabble player, their score, and held letters.
+# Players can be human or AI agents.
 
-#A representação escolhida para este TAD é um dicionário
+# Internal Representation: A dictionary structure.
 
-# region Construtores
-def cria_humano (nome):
+# region Constructors
+def create_human (name):
     """
-    Recebe uma cadeia de caracteres, não vazia, a representar
-    o nome do jogador e devolve um jogador de Scrabble humano
-    com 0 pontos e sem letras.
-    
-    cria_humano: {str} -> {dict}
-    """
-    
-    if not isinstance(nome, str) or nome == '':
-        raise ValueError('cria_humano: argumento inválido')
-    
-    return {'nome': nome, 'pontos': 0, 'letras': ''}
-
-def cria_agente(nivel):
-    """
-    Recebe uma cadeia de caracteres a representar o nível do
-    jogador ('FACIL', 'MEDIO' ou 'DIFICIL') e devolve um jogador
-    de Scrabble agente com 0 pontos e sem letras.
+    @brief Creates a human Scrabble player.
+    @param name Name of the player (non-empty string).
+    @return Dictionary representing the human player.
+    @exception ValueError If name is invalid.
     """
     
-    if not isinstance(nivel, str) or nivel not in {'FACIL', 'MEDIO', 'DIFICIL'}:
-        raise ValueError("cria_agente: argumento inválido")
+    if not isinstance(name, str) or name == '':
+        raise ValueError('create_human: invalid argument')
     
-    return {'nivel': nivel, 'pontos': 0, 'letras': ''}
+    return {'name': name, 'score': 0, 'letters': ''}
+
+def create_agent(level):
+    """
+    @brief Creates an AI agent Scrabble player.
+    @param level AI level ('FACIL', 'MEDIO', or 'DIFICIL').
+    @return Dictionary representing the agent player.
+    @exception ValueError If level is invalid.
+    """
+    
+    if not isinstance(level, str) or level not in {'FACIL', 'MEDIO', 'DIFICIL'}:
+        raise ValueError("create_agent: invalid argument")
+    
+    return {'level': level, 'score': 0, 'letters': ''}
 #endregion
 
-#region Seletores
-def jogador_identidade (jogador):
+#region Selectors
+def player_identity (player):
     """
-    Devolve o nome do jogador, caso este seja humano, ou o nível do jogador,
-    caso este seja agente.
-    
-    jogador_identidade: {jogador} -> {str}
-    """
-    
-    if 'nivel' in jogador: #Jogador agente
-        return jogador['nivel']
-    elif 'nome' in jogador: #Jogador humano
-        return jogador['nome']
-    
-def jogador_pontos(jogador):
-    """
-    Devolve os pontos do jogador fornecido como argumento
-    
-    jogador_pontos: {jogador} -> {int}
+    @brief Retrieves the player's identity (name for humans, level for agents).
+    @param player Player dictionary.
+    @return String identity.
     """
     
-    return jogador['pontos']
+    if 'level' in player: # AI Agent player
+        return player['level']
+    elif 'name' in player: # Human player
+        return player['name']
+    
+def player_points(player):
+    """
+    @brief Retrieves the player's current score.
+    @param player Player dictionary.
+    @return Score (int).
+    """
+    
+    return player['score']
 
-def jogador_letras(jogador):
+def player_letters(player):
     """
-    Devolve a cadeia de caracateres ordenada com todas as letras
-    do jogador fornecido como argumento.
-    
-    jogador_letras: {jogador} -> {srtr}
+    @brief Retrieves the sorted string of letters held by the player.
+    @param player Player dictionary.
+    @return Sorted string of letters.
     """
     
-    return jogador['letras']
+    return player['letters']
     
 # endregion
 
 # region Modificadores
-def recebe_letra (jogador, letra):
+def receive_letter (player, letter):
     """
-    Modifica destrutivamente o jogador fornecido como argumento,
-    acrescentando a letra indicada às suas letras, e devolve o próprio jogador.
-    
-    recebe_letra: {jogador, str} -> {jogador}
+    @brief Adds a letter to the player's collection (destructive).
+    @param player Player dictionary.
+    @param letter Letter string to add.
+    @return Updated player dictionary.
     """
     
-    letras_novas = jogador['letras'] + "".join(letra)
+    new_letters = player['letters'] + "".join(letter)
     
-    jogador['letras'] = "".join(sorted(letras_novas, key = chave))
+    player['letters'] = "".join(sorted(new_letters, key = key_func))
     
-    return jogador
+    return player
 
-def usa_letra (jogador, letra):
+def use_letter (player, letter):
     """
-    Modifica destrutivamente o jogador fornecido como argumento,
-    retirando a letra indicada às suas letras, e devolve o jogador.
-    
-    usa_letra: {jogador, str} -> {jogador}
+    @brief Removes a letter from the player's collection (destructive).
+    @param player Player dictionary.
+    @param letter Letter string to remove.
+    @return Updated player dictionary.
     """
     
-    jogador['letras'] = jogador['letras'].replace(letra, '', 1)
+    player['letters'] = player['letters'].replace(letter, '', 1)
     
-    return jogador
+    return player
 
-def soma_pontos (jogador, pontos):
+def add_points (player, score):
     """
-    Modifica destrutivamente o jogador fornecido como argumento,
-    somando os pontos indicados à sua pontuação atual, e devolve o próprio jogador.
-    
-    soma_pontos: {jogador, int} -> {jogador}
+    @brief Adds points to the player's score (destructive).
+    @param player Player dictionary.
+    @param score Points to add.
+    @return Updated player dictionary.
     """
     
-    jogador['pontos'] += pontos
+    player['score'] += score
     
-    return jogador
+    return player
 
 # endregion
 
 # region Reconhecedores
-def eh_jogador (argumento):
+def is_player (arg):
     """
-    Verifica se o argumento é um jogador e devolve True caso o argumento seja
-    um TAD Jogador ou False caso contrário.
-    
-    eh_jogador: {universal} -> {bool}
+    @brief Validates if the argument is a valid Player TAD.
+    @param arg Object to check.
+    @return True if valid, False otherwise.
     """
     
-    if not isinstance(argumento, dict):
+    if not isinstance(arg, dict):
         return False
     
-    if len(argumento.keys()) != 3:
+    if len(arg.keys()) != 3:
         return False
     
-    if 'nome' in argumento:
-        conjunto_chaves_padrao = {'nome', 'pontos', 'letras'}
-        if type(argumento['nome']) != str:
+    if 'name' in arg:
+        standard_keys_set = {'name', 'score', 'letters'}
+        if type(arg['name']) != str:
             return False
-    elif 'nivel' in argumento:
-        conjunto_chaves_padrao = {'nivel', 'pontos', 'letras'}
-        if type(argumento['nivel']) != str:
+    elif 'level' in arg:
+        standard_keys_set = {'level', 'score', 'letters'}
+        if type(arg['level']) != str:
             return False
     else:
         return False
     
-    for chave in argumento:
-       if chave not in conjunto_chaves_padrao:
+    for key_func in arg:
+       if key_func not in standard_keys_set:
            return False
        
-    if type(argumento['pontos']) != int or argumento['pontos'] < 0:
+    if type(arg['score']) != int or arg['score'] < 0:
         return False
     
-    if type(argumento['letras']) != str:
+    if type(arg['letters']) != str:
         return False
     
     return True
 
-def eh_humano (argumento):
+def is_human (arg):
     """
-    Devolve True caso o seu arguemento seja um TAD Jogador humano e False caso
-    contrário.
-    
-    eh_humano: {universal} -> {bool}
+    @brief Checks if the argument is a human player.
+    @param arg Object to check.
+    @return True if human, False otherwise.
     """
     
-    if eh_jogador(argumento):
-        if 'nome' in argumento:
+    if is_player(arg):
+        if 'name' in arg:
             return True
     
     return False
 
-def eh_agente (argumento):
+def is_agent (arg):
     """
-    Devolve True caso o seu arguemento seja um TAD Jogador agente e False caso
-    contrário.
-    
-    eh_humano: {universal} -> {bool}
+    @brief Checks if the argument is an AI agent player.
+    @param arg Object to check.
+    @return True if agent, False otherwise.
     """
     
-    if eh_jogador(argumento):
-        if 'nivel' in argumento:
+    if is_player(arg):
+        if 'level' in arg:
             return True
     
     return False
@@ -325,59 +322,61 @@ def eh_agente (argumento):
 #endregion
 
 # region Teste
-def jogadores_iguais (jog1, jog2):
+def players_equal (p1, p2):
     """
-    Devolve True apenas dejog1 e jog2 forem jogadores e forem iguais.
-    
-    jogadores_iguais: {universal, universal} -> {bool}
+    @brief Checks if two players are identical in identity, score, and letters.
+    @param p1 First player.
+    @param p2 Second player.
+    @return True if equal, False otherwise.
     """
-    if eh_humano(jog1) and eh_humano(jog2):
-        if jog1['nome'] == jog2['nome'] and jog1['pontos'] == jog2['pontos'] and jog1['letras'] == jog2['letras']:
+    if is_human(p1) and is_human(p2):
+        if p1['name'] == p2['name'] and p1['score'] == p2['score'] and p1['letters'] == p2['letters']:
             return True
-    elif eh_agente(jog1) and eh_agente(jog2):
-        if jog1['nivel'] == jog2['nivel'] and jog1['pontos'] == jog2['pontos'] and jog1['letras'] == jog2['letras']:
+    elif is_agent(p1) and is_agent(p2):
+        if p1['level'] == p2['level'] and p1['score'] == p2['score'] and p1['letters'] == p2['letters']:
             return True
     
     return False
 
 # endregion
 
-# region Trasformador
-def jogador_para_str(jogador):
+#endregion
+
+# region Transformer
+def player_to_str(player):
     """
-    Devolve a cadeia de caracteres que representa o jogador como
-    mostrado nos exemplos.
-    
-    jogador_para_str: {jogador} -> {str}
+    @brief Returns the string representation of a player's status.
+    @param player Player dictionary.
+    @return Formatted string: "NAME (SCORE): L E T T E R S".
     """
-    cadeia_letras_jogador = adicionar_caracter(jogador_letras(jogador), ' ')
+    player_letters_str = add_character(player_letters(player), ' ')
     
-    if eh_humano(jogador):
-        return f'{jogador_identidade(jogador)} ({jogador_pontos(jogador):>3}):{cadeia_letras_jogador}'
-    elif eh_agente(jogador):
-        return f'BOT({jogador_identidade(jogador)}) ({jogador_pontos(jogador):>3}):{cadeia_letras_jogador}'
+    if is_human(player):
+        return f'{player_identity(player)} ({player_points(player):>3}):{player_letters_str}'
+    elif is_agent(player):
+        return f'BOT({player_identity(player)}) ({player_points(player):>3}):{player_letters_str}'
 
 # endregion
 
 # region Funções de Alto Nível
-def distribui_letras(jogador, saco, num):
+def distribute_letters(player, sack, num):
     """
-    Retira um máximo de num letras do final da lista saco (potencialmente vazia)
-    e acrescenta-as ao jogador, devolvendo o jogador.
-    A função modifica destrutivamente a lista de letras e o jogador passados como
-    argumento.
-    
-    distribui_letras: {jogador, list, int} -> {jogador}
+    @brief Distributes a set number of letters from the sack to the player.
+    @details Modifies both the player hand and the sack list (destructive).
+    @param player Player dictionary.
+    @param sack List of available letters (sack).
+    @param num Maximum number of letters to distribute.
+    @return Updated player dictionary.
     """
     
     for i in range(0, num):
-        if len(saco) == 0:                  # Apenas adicionar uma letra se o
-            break                           # saco não estiver vazio.
+        if len(sack) == 0:                  # Only add a letter if the
+            break                           # sack is not empty.
         
-        #Adicionar a última letra do saco às letras do jogador e removê-la do saco
-        recebe_letra(jogador, saco.pop())
+        # Add the last letter from the sack to the player's hand and remove it
+        receive_letter(player, sack.pop())
     
-    return jogador
+    return player
     
  
 # endregion
@@ -385,125 +384,120 @@ def distribui_letras(jogador, saco, num):
 # endregion
 
 
-#region TAD Vocabulário
+#region Vocabulary TAD
 
-# O TAD vocabulario ´e usado para representar o conjunto de palavras que podem ser
-# utilizadas durante o jogo. Adicionalmente, o TAD vocabulario regista a pontuação das
-# palavras
+# The Vocabulary TAD represents the set of valid words allowed in the game.
+# It also calculates and stores word scores.
 
-# A estrutura de dados do TAD Vocabulário é organizada internamente por
-# comprimento e primeira letra, para isso irão ser utilizados dicionários
-# de dicionários.
+# The data structure is internally organized by word length and starting letter
+# using a nested dictionary structure for optimized lookups.
 
-# region Construtor
-def cria_vocabulario(v):
+# region Constructor
+def create_vocabulary(words_tuple):
     """
-    Devolve o vocabulário que contém as palavras contidas no tuplo v. O
-    construtor verifica a validade do seu argumento gerando um erro com
-    a mensagem (cria_vocabulário: argumento inválido).
-    
-    cria_vocabulario: {tuple} -> {vocabulario}
+    @brief Creates a vocabulary from a tuple of words.
+    @param words_tuple Tuple of strings.
+    @return Vocabulary dictionary structure.
+    @exception ValueError If the input is invalid.
     """
     
-    if not isinstance(v, tuple) or len(v) < 1:
-        raise ValueError('cria_vocabulario: argumento inválido')
+    if not isinstance(words_tuple, tuple) or len(words_tuple) < 1:
+        raise ValueError('create_vocabulary: invalid argument')
     
-    vocabulario = {}
-    for palavra in v:
-        #Verificar requisitos da palavra
-        if type(palavra) != str or not 2 <= len(palavra) <= 15:
-            raise ValueError('cria_vocabulario: argumento inválido')
-        for letra in palavra:
-            if letra not in {'A', 'B', 'C', 'Ç', 'D', 'E', 'F', 'G', 'H', 'I',
+    vocabulary = {}
+    for word in words_tuple:
+        # Validate word requirements
+        if type(word) != str or not 2 <= len(word) <= 15:
+            raise ValueError('create_vocabulary: invalid argument')
+        for letter in word:
+            if letter not in {'A', 'B', 'C', 'Ç', 'D', 'E', 'F', 'G', 'H', 'I',
                              'J', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
                              'U', 'V', 'X', 'Z'}:
-                raise ValueError('cria_vocabulario: argumento inválido')
+                raise ValueError('create_vocabulary: invalid argument')
         
-            #Adicionar palavra
-            if len(palavra) in vocabulario:
-                if palavra[0] in vocabulario[len(palavra)]:
-                    vocabulario[len(palavra)][palavra[0]] = vocabulario[len(palavra)][palavra[0]].union({palavra})
+            # Add word to structure
+            if len(word) in vocabulary:
+                if word[0] in vocabulary[len(word)]:
+                    vocabulary[len(word)][word[0]] = vocabulary[len(word)][word[0]].union({word})
                 else:
-                    vocabulario[len(palavra)][palavra[0]] = {palavra}
+                    vocabulary[len(word)][word[0]] = {word}
             else:
-                vocabulario[len(palavra)] = {}
-                vocabulario[len(palavra)][palavra[0]] = {palavra}
-    return vocabulario
+                vocabulary[len(word)] = {}
+                vocabulary[len(word)][word[0]] = {word}
+    return vocabulary
 
 # endregion
 
-# region Seletores
-def obtem_pontos(vocabulario, palavra):
+# region Selectors
+def get_points(vocabulary, word):
     """
-    Devolve os pontos da palavra do vocabolário, ou 0 caso não se encontre.
-    
-    obtem_pontos: {vocabulario, str} -> {int}
+    @brief Calculates the score of a word based on the vocabulary.
+    @param vocabulary Vocabulary dictionary.
+    @param word Word string.
+    @return Word score (int).
     """
-    pontos = {'A': 1, 'B': 3, 'C': 2, 'Ç': 3, 'D': 2, 'E': 1, 'F': 4, 'G': 4,
+    score = {'A': 1, 'B': 3, 'C': 2, 'Ç': 3, 'D': 2, 'E': 1, 'F': 4, 'G': 4,
               'H': 4, 'I': 1, 'J': 5, 'L': 2, 'M': 1, 'N': 3, 'O': 1, 'P': 2,
               'Q': 6, 'R': 1, 'S': 1, 'T': 1, 'U': 1, 'V': 4, 'X': 8, 'Z': 8}
-    letra_inicial = palavra[0]
-    comprimento = len(palavra)
+    initial_letter = word[0]
+    length = len(word)
     
-    pontuacao_palavra = 0
-    if palavra in vocabulario[comprimento][letra_inicial]: 
-        for letra in palavra:
-            pontuacao_palavra += pontos[letra]
+    current_score_word = 0
+    if word in vocabulary[length][initial_letter]: 
+        for letter in word:
+            current_score_word += score[letter]
     
-    return pontuacao_palavra
+    return current_score_word
 
-def obtem_palavras (vocabulario, comprimento, letra):
+def get_words (vocabulary, length, letter):
     """
-    Devolve um tuplo de pares que correspondem a todas as palavras com o 
-    comprimento e a primeira letra fornecidos como argumentos.
-    Cada par do tuplo contém a palavra e a respetiva pontuação. Os pares devem
-    estar oredenados por ordem decrescente de pontuação das palavras, e em caso
-    de empate, por ordem lexicográfica. Caso não existam no vocabuário
-    palavras com o comprimento e a primeira letra indicados, a função deverá
-    devolver um tuplo vazio.
-    
-    obtem_palavras: {vocabulario, int, str} -> {tuple}
+    @brief Retrieves all words with a specific length and starting letter.
+    @param vocabulary Vocabulary dictionary.
+    @param length Word length.
+    @param letter Starting letter.
+    @return Tuple of (word, score) pairs, sorted by score and then alphabetically.
     """
-    if letra not in vocabulario[comprimento]:
+    if letter not in vocabulary[length]:
         return ()
     
-    tuplo_de_pares = ()
-    for palavra in vocabulario[comprimento][letra]:
-        tuplo_de_pares += ((palavra, int(obtem_pontos(vocabulario, palavra))),)
+    pairs_tuple = ()
+    for word in vocabulary[length][letter]:
+        pairs_tuple += ((word, int(get_points(vocabulary, word))),)
 
-    return tuple(sorted(tuplo_de_pares, key=lambda x: (-x[1], chave(x[0]))))
+    return tuple(sorted(pairs_tuple, key=lambda x: (-x[1], key_func(x[0]))))
     
         
 # endregion
 
-# region Teste
-def testa_palavra_padrao(vocabulario, palavra, padrao, letras):
+# region Testing
+def test_word_pattern(vocabulary, word, pattern, letters):
     """
-    Devolve True caso exista a palavra no vocabulário e seja possível formar
-    a palavra forncida substituindo os caracteres '.' do padrão por letras
-    presentes na cadeia de caracteres letras, caso contrário, devolve False.
-    
-    testa_palavra_padrao: {vocabulario. str, str, str} -> {bool}
+    @brief Checks if a word exists in the vocabulary and fits a given pattern.
+    @details Validates if the player's letters can fill the pattern dots to form the word.
+    @param vocabulary Vocabulary dictionary.
+    @param word Word to test.
+    @param pattern Board pattern string.
+    @param letters Letters available in player's hand.
+    @return True if word fits, False otherwise.
     """
 
-    letra_inicial = palavra[0]
-    comprimento = len(palavra)
-    letras_jogador = letras
+    initial_letter = word[0]
+    length = len(word)
+    letters_player = letters
     
-    # Verificar se a palavra está no vocabulário para o seu comprimento e letra
-    # inicial sem levantar um key error.
-    palavras_letra = vocabulario.get(comprimento, {}).get(letra_inicial, set())
-    if palavra not in palavras_letra:
+    # Verify if word exists in vocabulary for its length and initial letter
+    words_by_letter = vocabulary.get(length, {}).get(initial_letter, set())
+    if word not in words_by_letter:
         return False
     
-    if comprimento == len(padrao):
-        for i in range(comprimento):
-            if padrao[i] != '.' and padrao[i] != palavra[i]:
+    if length == len(pattern):
+        for i in range(length):
+            if pattern[i] != '.' and pattern[i] != word[i]:
                 return False
-            elif padrao[i] == '.':
-                if palavra[i] not in letras_jogador:
+            elif pattern[i] == '.':
+                if word[i] not in letters_player:
                     return False
-                letras_jogador = letras_jogador.replace(palavra[i], '', 1)
+                letters_player = letters_player.replace(word[i], '', 1)
         
         return True
     
@@ -512,216 +506,203 @@ def testa_palavra_padrao(vocabulario, palavra, padrao, letras):
 
 # endregion
 
-# region Transformadores
-def ficheiro_para_vocabulario(nome_ficheiro):
+#endregion
+
+# region Transformers
+def file_to_vocabulary(filename):
     """
-    Devolve o vocabolário formado a partir das palavras contidas no ficheiro
-    fornecido como argumento. Considere que o ficheiro contém uma palavra por
-    linha, podendo ter linhas vazias (que serão ignoradas).
-    As palavras do ficheiro são sequências de caracteres únicaas de comprimento
-    arbitrário, contendo potencialmente qualquer caracter. Para a construção
-    do vocabulário considere as palavras de comprimento de 2 a 15 letras do abecedário
-    português, convertidas para letras maiscúlas.
-    
-    ficheiro_para_vocabulario: {str} -> {vocabolario}
+    @brief Loads a vocabulary from a text file.
+    @details Reads each line, converts to uppercase, and filters valid 2-15 letter words.
+    @param filename Path to the vocabulary file.
+    @return Vocabulary dictionary structure.
     """
     
-    with open(nome_ficheiro, 'r') as f:
-        # Obter todas as linhas do ficheiro
-        linhas = f.readlines()
+    with open(filename, 'r') as f:
+        # Read all lines from file
+        lines = f.readlines()
         
     
-        letras_validas = {'A', 'B', 'C', 'Ç', 'D', 'E', 'F', 'G', 'H', 'I',
+        valid_letters = {'A', 'B', 'C', 'Ç', 'D', 'E', 'F', 'G', 'H', 'I',
                         'J', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
                         'V', 'X', 'Z'}
         
-        tuplo_palavras = ()
-        for linha in linhas:
-            # obter a palavra maiusculada sem o '\n'
-            palavra = linha.strip().upper()
-            #Confirmar as letras e tamanho
-            if 2 <= len(palavra) <= 15 and all(letra in letras_validas for letra in palavra):
-                tuplo_palavras += (palavra,)
+        words_tuple = ()
+        for line in lines:
+            # Get uppercase word and strip newlines
+            word = line.strip().upper()
+            # Validate letters and length
+            if 2 <= len(word) <= 15 and all(char in valid_letters for char in word):
+                words_tuple += (word,)
         
-        return cria_vocabulario(tuplo_palavras)
+        return create_vocabulary(words_tuple)
     
 
-def vocabulario_para_str (vocabulario):
+def vocabulary_to_str (vocabulary):
     """
-    Devolve uma cadeia de caracteres que concatena todas as palavras guardadas no
-    vocabulário, separadas por um caracter de mudança de linha. As palavras devem
-    estar ordenadas por ordem crescente do seu compriento e, para o mesmo
-    comprimento, por ordem lexicográfica do seu primeiro caracter. Palavras que
-    tenham o mesmo comprimento e o o mesmo primeiro caracter, devem estar ordenadas
-    pala ordem definida no selotor obtem palavras.
+    @brief Returns the full vocabulary content as a single newline-separated string.
+    @details Words are ordered by length and then alphabetically.
+    @param vocabulary Vocabulary dictionary.
+    @return Multi-line string of all words.
     """
 
-    palavras = []
-    for comprimento in sorted(vocabulario.keys()): # ordem crescente de comprimento
-        for letra_inicial in sorted(vocabulario[comprimento]): # ordem lexicográfica do primeiro caracter
-            for palavra, _ in obtem_palavras(vocabulario, comprimento, letra_inicial):
-                palavras.append(palavra) # obtem_palavras já devolve um tuplo de pares (palavra, pontos) ordenado corretamente.
+    words = []
+    for length in sorted(vocabulary.keys()): # Ascending order of length
+        for initial_letter in sorted(vocabulary[length]): # Lexicographical order of first character
+            for word, _ in get_words(vocabulary, length, initial_letter):
+                words.append(word) # get_words already returns correctly sorted pairs.
                 
-    return '\n'.join(palavras)
+    return '\n'.join(words)
             
-# endregion
+#endregion
 
-# region Funções Alto Nível
+# region High-Level Functions
 
-def procura_palavra_padrao(vocabulario, padrao, letras, min_pontos):
+def search_word_pattern(vocabulary, pattern, letters, min_score):
     """
-    Devolve o tuplo formado pela palavra e a pontuação, que correspondem à
-    palavra do vocabulário com a maior pontuação que é possível formar
-    utilizando as letras da cadeia de caracteres letras para completar todos
-    os espaços livres do padrão fornecido com argumento, cumprindo a restrição
-    de que a pontuação da palavra não poderá ser inferior a min_pontos.
-    Caso a função não encontre nenhuma palavra, deverá devolver o tuplo ('', 0).
-        
-    procura_palavra_padrao: {vocabulario, str, str, int} -> {tuple}
+    @brief Searches for the highest-scoring word that fits a given board pattern.
+    @param vocabulary Vocabulary dictionary.
+    @param pattern Board pattern string (letters and dots).
+    @param letters Letters available in player's hand.
+    @param min_score Minimum acceptable score to consider.
+    @return Tuple of (best_word, score). Returns ('', 0) if no word fits.
     """
     
-    comprimento = len(padrao)
-    pontuacao = 0
-    palavra_escolhida = ''
+    length = len(pattern)
+    current_score = 0
+    chosen_word = ''
 
-    # Se não existe esse comprimento no vocabulário
-    if comprimento not in vocabulario:
+    # If this length does not exist in the vocabulary
+    if length not in vocabulary:
         return ('', 0)
 
-    # Padrão começa com uma letra (fixa)
-    if padrao[0] != '.':
-        palavras = obtem_palavras(vocabulario, len(padrao), padrao[0])
-        # obtem_palavras deve devolver um tuplo de pares (palavra, pontos)
-        for tuplo in palavras:
-            # proteger contra entradas inesperadas
-            if not (isinstance(tuplo, tuple) and len(tuplo) >= 1):
+    # Pattern starts with a fixed letter
+    if pattern[0] != '.':
+        words = get_words(vocabulary, len(pattern), pattern[0])
+        for pair_item in words:
+            # Protect against unexpected inputs
+            if not (isinstance(pair_item, tuple) and len(pair_item) >= 1):
                 continue
-            palavra = tuplo[0]
-            # só testar palavra se ela for string
-            if not isinstance(palavra, str):
+            word = pair_item[0]
+            # só testar word se ela for string
+            if not isinstance(word, str):
                 continue
-            pontos_palavra = obtem_pontos(vocabulario, palavra)
-            if pontos_palavra > pontuacao and testa_palavra_padrao(vocabulario, palavra, padrao, letras):
-                pontuacao = pontos_palavra
-                palavra_escolhida = palavra
-            elif pontos_palavra == pontuacao and testa_palavra_padrao(vocabulario, palavra, padrao, letras):
-                if palavra_escolhida == '' or palavra < palavra_escolhida:
-                    palavra_escolhida = palavra
+            score_word = get_points(vocabulary, word)
+            if score_word > current_score and test_word_pattern(vocabulary, word, pattern, letters):
+                current_score = score_word
+                chosen_word = word
+            elif score_word == current_score and test_word_pattern(vocabulary, word, pattern, letters):
+                if chosen_word == '' or word < chosen_word:
+                    chosen_word = word
 
-    # O padrão começa vazio — temos de tentar todas as letras do conjunto 'letras'
+    # Pattern starts empty — try all letters from hand
     else:
-        palavras = ()
-        for letra in letras:
-            # obtem_palavras deve devolver um tuplo de pares (palavra, pontos) ou ()
-            pares = obtem_palavras(vocabulario, len(padrao), letra)
+        words = ()
+        for letter in letters:
+            # get_words should return a tuple of (word, score) pairs or ()
+            pares = get_words(vocabulary, len(pattern), letter)
             if not pares:
                 continue
-            # concatenar apenas se pares for do tipo iterável de pares
-            palavras += tuple(pares)
+            # Concatenate only if pairs is an iterable of pairs
 
-        # iterar sobre tuplos (palavra, pontos) — protegendo contra entradas inválidas
-        for item in palavras:
+        # Iterate over (word, score) tuples - protecting against invalid entries
+        for item in words:
             if not (isinstance(item, tuple) and len(item) >= 1):
                 continue
-            palavra = item[0]
-            if not isinstance(palavra, str):
+            word = item[0]
+            if not isinstance(word, str):
                 continue
-            pontos_palavra = obtem_pontos(vocabulario, palavra)
-            if pontos_palavra > pontuacao and testa_palavra_padrao(vocabulario, palavra, padrao, letras):
-                pontuacao = pontos_palavra
-                palavra_escolhida = palavra
-            elif pontos_palavra == pontuacao and testa_palavra_padrao(vocabulario, palavra, padrao, letras):
-                if palavra_escolhida == '' or palavra < palavra_escolhida:
-                    palavra_escolhida = palavra
+            score_word = get_points(vocabulary, word)
+            if score_word > current_score and test_word_pattern(vocabulary, word, pattern, letters):
+                current_score = score_word
+                chosen_word = word
+            elif score_word == current_score and test_word_pattern(vocabulary, word, pattern, letters):
+                if chosen_word == '' or word < chosen_word:
+                    chosen_word = word
 
-    return (palavra_escolhida, pontuacao) if pontuacao >= min_pontos else ('', 0)
+    return (chosen_word, current_score) if current_score >= min_score else ('', 0)
         
 # endregion
 
 #endregion
 
 
-#region TAD Tabuleiro
+#region Board TAD
 
-# A representação escolhida para este TAD é uma matriz - uma lista de listas.
+# Internal Representation: A 15x15 matrix (list of lists).
+# The board TAD represents the Scrabble board and the letters placed on it.
 
-# O TAD tabuleiro ´e usado para representar um tabuleiro do jogo Scrabble e as letras
-# nele colocadas.
-
-# region Construtores
-def cria_tabuleiro ():
+# region Constructors
+def create_board ():
     """
-    Vevolve um tabuleiro de Scrabble vazio.
-    
-    cria_tabuleiro: {} -> tabuleiro
+    @brief Creates a new empty Scrabble board.
+    @return 15x15 matrix (list of lists) initialized with ".".
     """
     
-    tabuleiro = []
+    board = []
     for i in range(15):
-        linha = []
+        row = []
         for j in range(15):
-            linha.append(".")
-        tabuleiro.append(linha)
+            row.append(".")
+        board.append(row)
 
-    return tabuleiro
+    return board
+#endregion
 
-# endregion
-
-# region Seletores
-def obtem_letra(tabuleiro, casa):
+# region Selectors
+def get_letter(board, square):
     """
-    Devolve a letra contida na casa indicada do tabuleiro fornecido como argumento.
-    
-    obtem_letras: {tabuleiro, casa} -> str
+    @brief Retrieves the letter at a given board position.
+    @param board Board matrix.
+    @param square Square tuple.
+    @return Character at the position.
     """
     
-    return tabuleiro[obtem_lin(casa) - 1][obtem_col(casa) - 1] #Passar de 1-based para 0-based
+    return board[get_line(square) - 1][get_column(square) - 1] # Map 1-based to 0-based
 
 # endregion
 
 # region Modificadores
-def insere_letra(tabuleiro, casa, letra):
+def insert_letter(board, square, letter):
     """
-    Modifica destrutivamente o tabuleiro fornecido como argumento, colocando a letra
-    indicada na casa fornecida, e devolve o próprio tabuleiro.
-    
-    insere_letra: {tabuleiro, casa, str} -> {tabuleiro}
+    @brief Inserts a letter into the board (destructive).
+    @param board Board matrix.
+    @param square Square tuple.
+    @param letter Letter string to insert.
+    @return Updated board matrix.
     """
-    tabuleiro[obtem_lin(casa) - 1][obtem_col(casa) - 1] = letra #Passar de 1-based para 0-based
+    board[get_line(square) - 1][get_column(square) - 1] = letter # Map 1-based to 0-based
 
-    return tabuleiro
+    return board
+#endregion
 
-# endregion
-
-# region Reconhecedores
-def eh_tabuleiro(argumento):
+# region Recognizers
+def is_board(arg):
     """
-    Devolve caso o argumento seja um TAD Tabuleiro e False caso contrário.
-    
-    eh_tabuleiro: {universal} -> {bool}
+    @brief Validates if the argument is a valid Board TAD.
+    @param arg Object to check.
+    @return True if valid, False otherwise.
     """
     
-    if type(argumento) == list: # Confirmar a estrutura
-        if len(argumento) == 15: # Confirmar o número de linhas
-            for linha in argumento:
-                if type(linha) == list: #Confirmar a estrutura
-                    if len(linha) == 15: #Confirmar número de colunas
+    if type(arg) == list: # Confirm structure
+        if len(arg) == 15: # Confirm number of rows
+            for line in arg:
+                if type(line) == list: # Confirm structure
+                    if len(line) == 15: # Confirm number of columns
                         return True
             
     return False
 
 
-def eh_tabuleiro_vazio(argumento):
+def is_board_empty(arg):
     """
-    Devolve True caso o argumento seja um TAD Tabuleiro e estiver vazio, caso
-    contrário devolve False.
-    
-    eh_tabuleiro. {universal} -> {bool}
+    @brief Checks if the board is empty (all positions are ".").
+    @param arg Board object.
+    @return True if empty, False otherwise.
     """
-    if eh_tabuleiro(argumento):
-        for linha in range(1, 16):
-            for coluna in range (1, 16):
-                if obtem_letra(argumento, cria_casa(linha, coluna)) != '.':
+    if is_board(arg):
+        for line in range(1, 16):
+            for column in range (1, 16):
+                if get_letter(arg, create_square(line, column)) != '.':
                     return False
         return True
     
@@ -730,228 +711,229 @@ def eh_tabuleiro_vazio(argumento):
 # endregion
 
 # region Teste
-def tabuleiros_iguais(argumento1, argumento2):
+def boards_equal(arg1, arg2):
     """
-    Devolve True se ambos os argumentos forem TAD's Tabuleiro e forem iguais,
-    caso contrário devolve False.
-    
-    tabuleiros_iguais: {universal, universal} -> {bool}
+    @brief Checks if two boards are identical in structure and content.
+    @param arg1 First board.
+    @param arg2 Second board.
+    @return True if equal, False otherwise.
     """
-    if eh_tabuleiro(argumento1) and eh_tabuleiro(argumento2): #Verificar se ambos são tabuleiros
-        for linha in range(1, 16):
-            for coluna in range (1, 16):
-                if obtem_letra(argumento1, cria_casa(linha, coluna)) != obtem_letra(argumento2, cria_casa(linha, coluna)):
+    if is_board(arg1) and is_board(arg2): # Verify if both are boards
+        for line in range(1, 16):
+            for column in range (1, 16):
+                if get_letter(arg1, create_square(line, column)) != get_letter(arg2, create_square(line, column)):
                     return False
         return True
 
 # endregion
 
 # region Transformador
-def tabuleiro_para_str(tabuleiro):
+def board_to_str(board):
     """
-    Devolve a cadeia de caracteres que representa o tabuleiro.
-    
-    tabuleiro_para_str: {tabuleiro} -> {str}
+    @brief Returns a string representation of the board for printing.
+    @param board Board matrix.
+    @return Multi-line string with board coordinates and borders.
     """
     
-    linha_divisao = "   +-------------------------------+"
+    line_divider = "   +-------------------------------+"
 
-    tabuleiro_str = "                       1 1 1 1 1 1\n"  # linha 1
-    tabuleiro_str += "     1 2 3 4 5 6 7 8 9 0 1 2 3 4 5\n"  # linha 2
-    tabuleiro_str += linha_divisao + '\n'  # linha 3
+    board_str = "                       1 1 1 1 1 1\n"  # Line 1
+    board_str += "     1 2 3 4 5 6 7 8 9 0 1 2 3 4 5\n"  # Line 2
+    board_str += line_divider + '\n'  # Line 3
 
-    # Adicionar as linhas de jogo
+    # Add game rows
     for i in range(15):
-        # Cria um str com os caracteres da linha
-        linha = "".join(filter(filtro_caracteres, tabuleiro[i]))
+        # Create string with row characters
+        line = "".join(filter(character_filter, board[i]))
 
-        # Adicionar os espaços a cada linha
-        linha = adicionar_caracter(linha, ' ')
+        # Add spaces to each row
+        line = add_character(line, ' ')
 
-        # Adicionar os limites a cada linha
-        linha = " |" + linha + " |\n"
+        # Add borders to each row
+        line = " |" + line + " |\n"
 
-        # Adicionar a linha ao tabuleiro
+        # Add row to board string
         if i < 9:
-            tabuleiro_str = tabuleiro_str + f" {i + 1}" + linha #Formatação devido ao digito a menos na linha
+            board_str = board_str + f" {i + 1}" + line # Alignment for single digits
         else:
-            tabuleiro_str = tabuleiro_str + f"{i + 1}" + linha  #Linha com dois dígitos, não precisa de espaço
+            board_str = board_str + f"{i + 1}" + line  # Two digits, no extra space needed
 
-    tabuleiro_str += linha_divisao #última linha
+    board_str += line_divider # Last line
 
-    return tabuleiro_str
+    return board_str
+#endregion
 
-# endregion
-
-# region Funções de Alto Nível
-def obtem_padrao(tabuleiro, casa_i, casa_f):
+# region High-Level Functions
+def get_pattern(board, square_i, square_f):
     """
-    Devolve a sequência de letras contida no tabuleiro entre a casa inicial, casa_i,
-    e a casa final, casa_f, (ambas inclusive) na mesma linha ou coluna.
+    @brief Retrieves the sequence of letters between two board positions.
+    @param board Board matrix.
+    @param square_i Starting square.
+    @param square_f Ending square.
+    @return String of characters found in the specified range.
+    @exception ValueError If squares are not in the same line or column.
     """
     
-    linha_i = obtem_lin(casa_i)
-    linha_f = obtem_lin(casa_f)
+    line_i = get_line(square_i)
+    line_f = get_line(square_f)
     
-    coluna_i = obtem_col(casa_i)
-    coluna_f = obtem_col(casa_f)
+    column_i = get_column(square_i)
+    column_f = get_column(square_f)
     
-    padrao = ''
+    pattern = ''
     
         
-    if linha_i == linha_f:  # As casas estão na mesma linha
-        for coluna in range(coluna_i, coluna_f + 1):
-            casa_atual = cria_casa(linha_i, coluna)
-            padrao += obtem_letra(tabuleiro, casa_atual)
+    if line_i == line_f:  # Squares are in the same line
+        for column in range(column_i, column_f + 1):
+            current_square = create_square(line_i, column)
+            pattern += get_letter(board, current_square)
     
-    elif coluna_i == coluna_f: # As casas estão na mesma coluna
-        for linha in range(linha_i, linha_f + 1):
-            casa_atual = cria_casa(linha, coluna_i)
-            padrao += obtem_letra(tabuleiro, casa_atual)
+    elif column_i == column_f: # Squares are in the same column
+        for line in range(line_i, line_f + 1):
+            current_square = create_square(line, column_i)
+            pattern += get_letter(board, current_square)
     else:
-        raise ValueError("obtem_padrao: argumentos invalidos")
+        raise ValueError("get_pattern: invalid arguments")
     
-    return padrao
+    return pattern
 
 
-def insere_palavra(tabuleiro, casa, direcao, palavra):
+def insert_word(board, square, direction, word):
     """
-    Modifica destrutivamente o tabuleiro fornecido colocando a palavra selecionada
-    na casa indicada na direção pretendida e devolve o próprio tabuleiro.
-    
-    insere_palavra: {tabuleiro, casa, str, str} -> {tabuleiro}
+    @brief Inserts a word onto the board (destructive).
+    @param board Board matrix.
+    @param square Starting square tuple.
+    @param direction Direction ("V" or "H").
+    @param word Word string to insert.
+    @return Updated board matrix.
     """
     
-    if direcao == 'V':
-        for i in range(len(palavra)):
-            insere_letra(tabuleiro, cria_casa(obtem_lin(casa) + i, obtem_col(casa)), palavra[i])
-    elif direcao == 'H':
-        for i in range(len(palavra)):
-            insere_letra(tabuleiro, cria_casa(obtem_lin(casa), obtem_col(casa) + i), palavra[i])
+    if direction == 'V':
+        for i in range(len(word)):
+            insert_letter(board, create_square(get_line(square) + i, get_column(square)), word[i])
+    elif direction == 'H':
+        for i in range(len(word)):
+            insert_letter(board, create_square(get_line(square), get_column(square) + i), word[i])
     
-    return tabuleiro
+    return board
 
 
-def obtem_subpadroes (tabuleiro, casa_i, casa_f, numero_maximo_espacos):
+def get_subpatterns (board, square_i, square_f, max_spaces):
     """
-    Devolve dois tuplos de igual tamanho. O primeiro tuplo contém todos os
-    subpadrões viáveis ordenados gerados a partir do padrão original contido
-    no tabuleiro fornecido como argumento, entre as casas casa_i e casa_f
-    (ambas inclusive), com, no máximo, numero_maximo_espaços espaços livres.
-    O segundo tuplo contém a casa onde começa cada um dos subpadrões
-    correspondentes do primeiro tuplo. As casas casa_i e casa_f pertencem à
-    mesma linha ou à mesma coluna.
+    @brief Generates all viable sub-patterns from a given board segment.
+    @param board Board matrix.
+    @param square_i Starting square.
+    @param square_f Ending square.
+    @param max_spaces Maximum allowed empty spaces (dots).
+    @return Tuple of (sub-patterns, starting squares).
     """
     
-    padrao = obtem_padrao(tabuleiro, casa_i, casa_f)
-    tuplo_subpadroes = ()
-    tuplo_casas_i = ()
+    pattern = get_pattern(board, square_i, square_f)
+    subpatterns_tuple = ()
+    squares_tuple = ()
     
-    for i in range(len(padrao)):
-        for j in range(len(padrao), i, -1):  # ordem: mais longo primeiro
-            subpadrao = padrao[i:j]
+    for i in range(len(pattern)):
+        for j in range(len(pattern), i, -1):  # ordem: mais longo primeiro
+            subpattern = pattern[i:j]
             
-            # Contar espaços livres
-            n_espacos = subpadrao.count('.')
-            if n_espacos == 0 or n_espacos > numero_maximo_espacos:
-                continue  # regra 2 e limite máximo
+            # Count empty spaces
+            n_espacos = subpattern.count('.')
+            if n_espacos == 0 or n_espacos > max_spaces:
+                continue  # Valid patterns - rule 2 and maximum limit
 
-            # Confirmar que há pelo menos uma letra
-            tem_letra = any(c != '.' for c in subpadrao)
-            if not tem_letra:
-                continue  # regra 1
+            # Confirm there is at least one letter
+            has_letter = any(c != '.' for c in subpattern)
+            if not has_letter:
+                continue  # rule 1
 
-            # Confirmar que não está colado a outras letras
-            anterior_livre = (i == 0) or (padrao[i - 1] == '.')
-            seguinte_livre = (j == len(padrao)) or (padrao[j] == '.')
-            if not (anterior_livre and seguinte_livre):
-                continue  # regra 3
+            # Confirm that it is not adjacent to other letters
+            free_before = (i == 0) or (pattern[i - 1] == '.')
+            free_after = (j == len(pattern)) or (pattern[j] == '.')
+            if not (free_before and free_after):
+                continue  # rule 3
 
-            # Subpadrão viável — guardar
-            tuplo_subpadroes += (subpadrao,)
-            if obtem_lin(casa_i) == obtem_lin(casa_f):
-                tuplo_casas_i += (cria_casa(obtem_lin(casa_i), obtem_col(casa_i) + i),)
+            # Viable sub-pattern - store it
+            subpatterns_tuple += (subpattern,)
+            if get_line(square_i) == get_line(square_f):
+                squares_tuple += (create_square(get_line(square_i), get_column(square_i) + i),)
             else:
-                tuplo_casas_i += (cria_casa(obtem_lin(casa_i) + i, obtem_col(casa_i)),)
+                squares_tuple += (create_square(get_line(square_i) + i, get_column(square_i)),)
     
-    return tuplo_subpadroes , tuplo_casas_i
+    return subpatterns_tuple , squares_tuple
 
-def gera_todos_padroes(tabuleiro, numero_maximo_espacos):
+def generate_all_patterns(board, max_spaces):
     """
-    Devolve três tuplos de igual tamanho. O primeiro contém todos os subpadrões
-    viáveis do tabuleiro que contenham,no máximo, numero_maximo_espacos de
-    espaços livres, formado pelos subpadrões ordenados obtidos de cada uma das
-    linhas completas do tabuleiro (da primeira à última), seguidos dos subpadrões
-    ordenados obtidos de cada coluna completa (da primeira até à última). O
-    segundo e terceiro tuplos, correspondem à casa de início e à direção ('V' ou
-    'H') do subpadrão correspondente do primeiro tuplo.
-    
-    gera_todos_padroes: {tabuleiro, int} -> {tuple, tuple, tuple}
+    @brief Generates all viable patterns from the entire board.
+    @param board Board matrix.
+    @param max_spaces Maximum allowed dots per pattern.
+    @return Tuple of (patterns, squares, directions).
     """
     
-    tuplo_subpadroes = ()
-    tuplo_casas_i = ()
-    tuplo_direcoes = ()
+    subpatterns_tuple = ()
+    squares_tuple = ()
+    directions_tuple = ()
     
-    # Subpadrões das linhas
-    for linha in range(1, 16):
-        casa_i = cria_casa(linha, 1)
-        casa_f = cria_casa(linha, 15)
+    # Horizontal patterns
+    for line in range(1, 16):
+        square_i = create_square(line, 1)
+        square_f = create_square(line, 15)
         
-        subpadroes, casas_i = obtem_subpadroes(tabuleiro, casa_i, casa_f, numero_maximo_espacos)
+        subpatterns, squares_i = get_subpatterns(board, square_i, square_f, max_spaces)
         
-        tuplo_subpadroes += subpadroes
-        tuplo_casas_i += casas_i
-        tuplo_direcoes += tuple('H' for _ in subpadroes)
+        subpatterns_tuple += subpatterns
+        squares_tuple += squares_i
+        directions_tuple += tuple('H' for _ in subpatterns)
         
-    # Subpadrões das colunas
-    for coluna in range(1, 16):
-        casa_i = cria_casa(1, coluna)
-        casa_f = cria_casa(15, coluna)
+    # Vertical patterns
+    for column in range(1, 16):
+        square_i = create_square(1, column)
+        square_f = create_square(15, column)
         
-        subpadroes, casas_i = obtem_subpadroes(tabuleiro, casa_i, casa_f, numero_maximo_espacos)
+        subpatterns, squares_i = get_subpatterns(board, square_i, square_f, max_spaces)
         
-        tuplo_subpadroes += subpadroes
-        tuplo_casas_i += casas_i
-        tuplo_direcoes += tuple('V' for _ in subpadroes)
+        subpatterns_tuple += subpatterns
+        squares_tuple += squares_i
+        directions_tuple += tuple('V' for _ in subpatterns)
     
-    return tuplo_subpadroes, tuplo_casas_i, tuplo_direcoes
+    return subpatterns_tuple, squares_tuple, directions_tuple
 
-# endregion
+#endregion
 
 #endregion
 
 
-#region Funções Adicionais
-def baralha_saco(seed):
-    """
-    É uma função auxiliar que recebe um inteiro positivo seed representando o estado
-    inicial do gerador de números pseudo-aleatório do primeiro projeto, e devolve uma
-    lista baralhada com todas as letras contidas no saco de Scrabble.
+#region Additional Functions
 
-    baralha_saco: {int} -> {list}
+# Miscellaneous helper functions for game state and randomization.
+def shuffle_sack(seed):
+    """
+    @brief Shuffles the Scrabble letter sack using a seed.
+    @param seed Random generator seed.
+    @return List of shuffled letters.
     """
     
-    saco = {'A': 14, 'B': 3, 'C': 4, 'Ç': 2, 'D': 5, 'E': 11,
+    sack_dict = {'A': 14, 'B': 3, 'C': 4, 'Ç': 2, 'D': 5, 'E': 11,
             'F': 2, 'G': 2, 'H': 2, 'I': 10, 'J': 2, 'L': 5,
             'M': 6, 'N': 4, 'O': 10, 'P': 4, 'Q': 1, 'R': 6,
             'S': 8, 'T': 5, 'U': 7, 'V': 2, 'X': 1, 'Z': 1 }
 
-    conjunto = elementos_conjunto(saco)     #Criar uma lista com todas as letras do conjunto (dict)
+    shuffled_letters = set_elements(sack_dict)     # Create a list with all letters from the set (dict)
 
-    permuta_letras(conjunto, seed)        #Baralhar a lista
+    permute_letters(shuffled_letters, seed)        # Shuffle the list
 
-    return conjunto
+    return shuffled_letters
 
 
-def jogada_humano (tabuleiro, jogador, vocabulario, pilha):
+def human_move (board, player, vocabulary, sack):
     """
-    É uma função auxiliar que recebe um tabuleiro, um jogador humano, um vocabulario,
-    e uma lista de letras. A função processa o turno completo do jogador humano.
-    
-    joagada_humano: {tabuleiro, jogador, vocabulario, list} -> {bool}
+    @brief Processes a human player's turn.
+    @param board Board matrix.
+    @param player Player dictionary.
+    @param vocabulary Vocabulary dictionary.
+    @param sack Sack of letters (list).
+    @return True if a move/swap was made, False if passed.
     """
-    letras = [
+    letters = [
             "A",
             "B",
             "C",
@@ -978,459 +960,423 @@ def jogada_humano (tabuleiro, jogador, vocabulario, pilha):
             "Z",
         ]
     
-    # Obter jogada e processá-la:
+    # Obtain move and process it:
     while True:
         
-        continua = True #variável da Máquina de Estados
+        is_valid_move = True # State Machine variable
         
-        jogada = input(f"Jogada {jogador_identidade(jogador)}: ")
+        move_str = input(f"Move {player_identity(player)}: ")
         
-        # Jogada vazia
-        if jogada == '':
+        # Empty move
+        if move_str == '':
             continue
         
-        # Passar a jogada:
-        elif jogada == 'P':
+        # Pass the move:
+        elif move_str == 'P':
             return False
         
-        # Trocar letras
-        elif jogada[0] == 'T':
-            # Focar apenas nas letras a trocar
-            jogada = jogada[2::]
+        # Swap letters
+        elif move_str[0] == 'T':
+            # Focus only on letters to swap
+            move_str = move_str[2::]
 
-            if len(jogada) % 2 == 0:
-                continua = False
+            if len(move_str) % 2 == 0:
+                is_valid_move = False
                 
-            if continua:
-                # Verificar se as letras estão separadas por " "
-                for index in range(len(jogada)):
-                    if index % 2 == 0 and not jogada[index] in jogador_letras(jogador):
-                        continua = False
+            if is_valid_move:
+                # Check if letters are separated by " "
+                for index in range(len(move_str)):
+                    if index % 2 == 0 and not move_str[index] in player_letters(player):
+                        is_valid_move = False
                         break
-                    elif index % 2 == 1 and not jogada[index] == " ":
-                        continua = False
+                    elif index % 2 == 1 and not move_str[index] == " ":
+                        is_valid_move = False
                         break
 
-            # Trocar as letras
-            if continua:
-                letras_a_trocar = jogada.split(' ')
+            # Swap the letters
+            if is_valid_move:
+                letters_to_swap = move_str.split(' ')
                 
-                #Verificar se há letras suficientes no saco
-                if len(letras_a_trocar) > len(pilha):
-                    # Não há letras suficientes no saco para a troca
-                    # O jogador deve tentar outra jogada
-                    continue  # Volta ao início do loop para nova tentativa
+                # Check if there are enough letters in the sack
+                # Not enough letters in sack for swap
+                # Player must try another move
+                continue  # Return to start of loop for new attempt
                 
-                for letra in letras_a_trocar:
-                    jogador = usa_letra(jogador, letra)
+                for letter in letters_to_swap:
+                    player = use_letter(player, letter)
                 
-                jogador = distribui_letras(jogador, pilha, len(letras_a_trocar))
+                player = distribute_letters(player, sack, len(letters_to_swap))
                 
                 return True
 
-        # Colocar palavra
-        elif jogada[0] == "J":
-            if jogada.count(" ") != 4:
-                continua = False
+        # Place word
+        elif move_str[0] == "J":
+            if move_str.count(" ") != 4:
+                is_valid_move = False
             else:
-                # Dividir a jogada em partes
-                partes = jogada.split()
+                # Split move into parts
+                move_parts = move_str.split()
                 
-                if len(partes) < 5:
-                    continua = False
+                if len(move_parts) < 5:
+                    is_valid_move = False
                 else:
-                    #atribuir as várias partes da jogada a variáveis próprias
-                    J, linha_str, coluna_str, direcao, palavra = partes
+                    # Assign move parts to specific variables
+                    J, line_str, column_str, direction, word = move_parts
 
-                    # Obter indicações de colocação da palavra
-                    linha = int(linha_str)
-                    coluna = int(coluna_str)
-                    if direcao not in ("H", "V"):
-                        continua = False
-                    if not (1 <= linha <= 15 and 1 <= coluna <= 15):
-                        continua = False
+                    # Get word placement details
+                    line = int(line_str)
+                    column = int(column_str)
+                    if direction not in ("H", "V"):
+                        is_valid_move = False
+                    if not (1 <= line <= 15 and 1 <= column <= 15):
+                        is_valid_move = False
 
-                    # Verificar se todas as letras são válidas
-                    for letra in palavra:
-                        if letra not in letras:
-                            continua = False
+                    # Check if all letters are valid
+                    for letter in word:
+                        if letter not in letters:
+                            is_valid_move = False
                             break
                 
-                if continua:
-                    casa_inicial = cria_casa(linha, coluna)
+                if is_valid_move:
+                    square_initial = create_square(line, column)
                     
-                    if direcao == 'V':
-                        casa_final = cria_casa(linha + len(palavra) - 1, coluna)
-                    elif direcao == 'H':
-                        casa_final = cria_casa(linha, coluna + len(palavra) - 1)
+                    if direction == 'V':
+                        square_final = create_square(line + len(word) - 1, column)
+                    elif direction == 'H':
+                        square_final = create_square(line, column + len(word) - 1)
                         
-                    padrao = obtem_padrao(tabuleiro, casa_inicial, casa_final)
+                    pattern = get_pattern(board, square_initial, square_final)
                     
-                    if not testa_palavra_padrao(vocabulario, palavra, padrao, jogador_letras(jogador)):
-                            continua = False
+                    if not test_word_pattern(vocabulary, word, pattern, player_letters(player)):
+                            is_valid_move = False
 
-                    if continua:
+                    if is_valid_move:
                         
-                        tab = insere_palavra(tabuleiro, casa_inicial, direcao, palavra)
+                        board = insert_word(board, square_initial, direction, word)
                         
-                        pontuacao_jogada = obtem_pontos(vocabulario, palavra)
+                        move_score = get_points(vocabulary, word)
                         
-                        jogador = soma_pontos(jogador, pontuacao_jogada)
+                        player = add_points(player, move_score)
                         
-                        # Remover as letras jogadas do conjunto do jogador
-                        letras_a_retirar = []
-                        for i in range(len(palavra)):
-                            if padrao[i] == '.':
-                                letras_a_retirar.append(palavra[i])
+                        # Remove played letters from player hand
+                        letters_to_remove = []
+                        for i in range(len(word)):
+                            if pattern[i] == '.':
+                                letters_to_remove.append(word[i])
                                 
-                        for letra in letras_a_retirar:
-                            jogador = usa_letra(jogador, letra)
+                        for letter in letters_to_remove:
+                            player = use_letter(player, letter)
                         
-                        # Repor as letras
-                        jogador = distribui_letras(jogador, pilha, len(letras_a_retirar))
+                        # Replenish letters
+                        player = distribute_letters(player, sack, len(letters_to_remove))
                         
                         return True
 
 
-def jogada_agente (tabuleiro, jogador, vocabulario, pilha):
+def agent_move (board, player, vocabulary, sack):
     """
-    É uma função auxiliar que recebe um tabuleiro, um jogador agente, um
-    vocabulário e uma lista de letras, e raliza uma das seguintes ações:
-    
-    - Passar: Se for a primeira jogada (tabuleiro vazio), ou, caso contrário, se
-    não conseguir Jogar nem Trocar. Neste caso a função devolve False sem alterar
-    nenhum dos argumentos.
-    
-    - Trocar: Caso não consiga Jogar e existam pelo menos sete letras no saco, troca
-    todas as letras. Neste caso, a função devolve True, modifica o jogador retirando
-    novas letras do final da lista de letras (que também é modificada).
-    
-    - Jogar: Devolve True e modifica o tabuleiro, atualiza o jogador, atualizando a sua
-    pontuação e retirando novas letras do final da lista de letras (que é também
-    modificada). Para escolher a palavra, a casa e a direção a função deve:
-    
-        1. Gerar todos os padrões possíveis para a configuaração atual do tabuleiro,
-        através da função gera_todos_padroes, tendo em conta o número de letras do jogador;
-        
-        2. Selecionar um de cada N padrões (operação slicing [::N]) obtidos anteriormente,
-        sendo N = 100, se nível for 'FACIL', N = 50, se nível for 'MEDIO', e N = 10, se nível
-        for 'DIFICIL'.
-        
-        3. Sobre cada um dos padrões resultantes, invocar a função procura_palavra_padrao e
-        selecionar a primeira palavra obtida com maior pontuação.
-        
-    A função apresenta a mensagem da jogada realizada imitando o formato utilizado pelos
-    jogadores humanos.
-    
-    jogada_agente: {tabuleiro, jogador, vocabulario, list} -> {bool}
+    @brief Processes an AI agent's turn.
+    @param board Board matrix.
+    @param player Agent player dictionary.
+    @param vocabulary Vocabulary dictionary.
+    @param sack Sack of letters (list).
+    @return True if a move/swap was made, False if passed.
     """
     
     
-    # Passar
-    if eh_tabuleiro_vazio(tabuleiro):
-        print(f'Jogada {jogador_identidade(jogador)}: P')
+    # Pass
+    if is_board_empty(board):
+        print(f'Move {player_identity(player)}: P')
         return False
     
-    #Jogar
+    # Play
     
-    #Gerar todos os padrões com base no número de letras do jogador
-    padroes, casas_i, direcoes= gera_todos_padroes(tabuleiro, len(jogador_letras(jogador)))
+    # Generate all patterns based on player hand size
+    patterns, squares_i, directions= generate_all_patterns(board, len(player_letters(player)))
         
-    #Slicing dos padrões conforme o nível do agente
-    if jogador_identidade(jogador) == 'FACIL':
-        padroes = padroes[::100]
-        casas_i = casas_i[::100]
-        direcoes = direcoes[::100]
+    # Slicing patterns based on agent level
+    if player_identity(player) == 'FACIL':
+        patterns = patterns[::100]
+        squares_i = squares_i[::100]
+        directions = directions[::100]
             
-    elif jogador_identidade(jogador) == 'MEDIO':
-        padroes = padroes[::50]
-        casas_i = casas_i[::50]
-        direcoes = direcoes[::50]
+    elif player_identity(player) == 'MEDIO':
+        patterns = patterns[::50]
+        squares_i = squares_i[::50]
+        directions = directions[::50]
             
-    elif jogador_identidade(jogador) == 'DIFICIL':
-        padroes = padroes[::10]
-        casas_i = casas_i[::10]
-        direcoes = direcoes[::10]
+    elif player_identity(player) == 'DIFICIL':
+        patterns = patterns[::10]
+        squares_i = squares_i[::10]
+        directions = directions[::10]
         
-    melhor_pontuacao = 0
-    melhor_jogada = None
+    best_score = 0
+    best_move = None
         
-    for i in range(len(padroes)):
+    for i in range(len(patterns)):
             
-        padrao = padroes[i]
-        casa_i = casas_i[i]
-        direcao = direcoes[i]
+        pattern = patterns[i]
+        square_i = squares_i[i]
+        direction = directions[i]
             
-        #Procurar palavra para este padrao
+        # Search for word for this pattern
             
-        palavra, pontuacao = procura_palavra_padrao(vocabulario, padrao, jogador_letras(jogador), melhor_pontuacao)
+        word, current_score = search_word_pattern(vocabulary, pattern, player_letters(player), best_score)
             
-        #Se encontrou uma palavra com melhor pontuação atualizar
+        # If a higher-scoring word is found, update best move
             
-        if pontuacao > melhor_pontuacao:
-            melhor_pontuacao = pontuacao
-            melhor_jogada = (palavra, casa_i, direcao, padrao)
+        if current_score > best_score:
+            best_score = current_score
+            best_move = (word, square_i, direction, pattern)
                 
-    # Se encontrou uma jogada válida
-    if melhor_jogada and melhor_jogada[0]:  # palavra não é vazia
-        palavra, casa_i, direcao, padrao = melhor_jogada
+    # If a valid move was found
+    if best_move and best_move[0]:  # Word is not empty
+        word, square_i, direction, pattern = best_move
         
-        # Inserir palavra no tabuleiro
-        tabuleiro = insere_palavra(tabuleiro, casa_i, direcao, palavra)
+        # Insert word on board
+        board = insert_word(board, square_i, direction, word)
             
-        #Atualizar pontuação
-        jogador = soma_pontos(jogador, melhor_pontuacao)
+        # Update score
+        player = add_points(player, best_score)
             
-        # Determinar as letras usadas (apenas as que preencheram espaços vazios)
-        letras_usadas = []
-        for i in range(len(palavra)):
-            if padrao[i] == '.':
-                letras_usadas.append(palavra[i])
+        # Determine letters used (those filling dots)
+        used_letters = []
+        for i in range(len(word)):
+            if pattern[i] == '.':
+                used_letters.append(word[i])
                     
-        #Remover as letras usadas
-        for letra in letras_usadas:
-            usa_letra(jogador, letra)
+        # Remove letters
+        for letter in used_letters:
+            use_letter(player, letter)
                 
-        #Repor letras
-        distribui_letras(jogador, pilha, len(letras_usadas))
+        # Replenish hand
+        distribute_letters(player, sack, len(used_letters))
         
-        # Mostrar jogada no formato correto
-        print(f"Jogada {jogador_identidade(jogador)}: J {obtem_lin(casa_i)} {obtem_col(casa_i)} {direcao} {palavra}")
+        # Show move in correct format
+        print(f"Move {player_identity(player)}: J {get_line(square_i)} {get_column(square_i)} {direction} {word}")
             
         return True
         
-    #Trocar - se não conseguiu jogar e há letras suficientes
-    elif len(pilha) >= 7:
-        # Guardar letras atuais para mostrar na mensagem
-        letras_atuais = jogador_letras(jogador)
+    # Swap - if no move was found and sack has enough letters
+    elif len(sack) >= 7:
+        # Store current letters for display
+        letters_atuais = player_letters(player)
         
-        #Remover as letras
-        for letra in jogador_letras(jogador):
-            jogador = usa_letra(jogador, letra)
+        # Remove letters
+        for letter in player_letters(player):
+            player = use_letter(player, letter)
             
-        #Adicionar as letras novas
-        jogador = distribui_letras(jogador, pilha, 7)
+        # Add new letters
+        player = distribute_letters(player, sack, 7)
         
-        # Mostrar jogada de troca
-        letras_formatadas = ' '.join(letras_atuais)
-        print(f"Jogada {jogador_identidade(jogador)}: T {letras_formatadas}")
+        # Show swap move
+        letters_formatadas = ' '.join(letters_atuais)
+        print(f"Move {player_identity(player)}: T {letters_formatadas}")
         
         return True
     
     else:
-        print(f"Jogada {jogador_identidade(jogador)}: P")
+        print(f"Move {player_identity(player)}: P")
         return False
     
     
-def scrabble2 (jogadores, nome_fich, seed):
+def scrabble2 (players, filename, seed):
     """
-    É a função principal que permite jogar um jogo completo de Scrabble2 de dois
-    a quatro jogadores. A função recebe um tuplo com o nome dos jogadores humanos
-    (cadeia de caracteres não vazia) e o nível dos jogadores agentes (cadeia de
-    caracteres a começar por '@' seguido do nível) na ordem em que jogam, um nome
-    de ficheiro com o vocabulário e um inteiro positivo representando o estado
-    inicial do gerador pseudo-aleatório, e devolve o tuplo com a pontuação final
-    obtida pelos jogadores.
-    
-    O Jogo começa baralhando o saco de letras e distribuindo o conjunto de 7 letras
-    a cada um dos jogadores em ordem. O Jogo desenrola-se depois conforme as regras.
-    
-    O Jogo termina quando todos os jogadores passam ou quando um jogador fica sem
-    letras e o saco está esgotado.  A função deve verificar a validade do seus argumentos,
-    gerando um erro com a mensagem 'scrabble2: argumwntos inválidos'.
-    
-    scrabble2: {tuple, string, int} -> {tuple}
+    @brief Main Scrabble game loop for 2-4 players.
+    @param players Tuple of player names or agent levels (e.g., "@FACIL").
+    @param filename Path to vocabulary file.
+    @param seed Random generator seed.
+    @return Tuple of final scores.
+    @exception ValueError If arguments are invalid.
     """
     
-    # Validação de argumentos
-    if (not isinstance(jogadores, tuple) or not  2 <= len(jogadores) <= 4 or
-        not isinstance(nome_fich, str) or nome_fich == '' or
+    # Argument validation
+    if (not isinstance(players, tuple) or not  2 <= len(players) <= 4 or
+        not isinstance(filename, str) or filename == '' or
         not isinstance(seed, int) or seed <= 0):
         
-        raise ValueError("scrabble2: argumentos inválidos")
+        raise ValueError("scrabble2: invalid arguments")
     
-    for j in jogadores:
+    for j in players:
         if not isinstance(j, str) or j == '':
-            raise ValueError('scrabble2: argumentos inválidos')
+            raise ValueError('scrabble2: invalid arguments')
         if j[0] == '@' and len(j) == 1:
-            raise ValueError('scrabble2: argumentos inválidos')
+            raise ValueError('scrabble2: invalid arguments')
         if j[0] == '@':
-            nivel = j[1:]
-            if nivel not in {'FACIL', 'MEDIO', 'DIFICIL'}:
-                raise ValueError('scrabble2: argumentos inválidos')
+            level = j[1:]
+            if level not in {'FACIL', 'MEDIO', 'DIFICIL'}:
+                raise ValueError('scrabble2: invalid arguments')
         
-    # Inicialização
-    print("Bem-vindo ao SCRABBLE2.")
+    # Initialization
+    print("Welcome to SCRABBLE2.")
     
-    tabuleiro = cria_tabuleiro()
+    board = create_board()
     
-    pilha = baralha_saco(seed)
+    sack = shuffle_sack(seed)
     
-    vocabulario = ficheiro_para_vocabulario(nome_fich)
+    vocabulary = file_to_vocabulary(filename)
     
-    # Criar listas de jogadores (humanos e agentes)
-    lista_jogadores = []
+    # Create player lists (humans and agents)
+    players_list = []
     
-    for nome in jogadores:
-        if nome[0] == '@':
-            lista_jogadores.append(cria_agente(nome[1::].upper()))
+    for name in players:
+        if name[0] == '@':
+            players_list.append(create_agent(name[1::].upper()))
         else:
-            lista_jogadores.append(cria_humano(nome))
+            players_list.append(create_human(name))
             
-    #Distribuir 7 letras a cada jogador
-    for i in range(len(lista_jogadores)):
-        lista_jogadores[i] = distribui_letras(lista_jogadores[i], pilha, 7)
+    # Distribute 7 letters to each player
+    for i in range(len(players_list)):
+        players_list[i] = distribute_letters(players_list[i], sack, 7)
         
-    # Loop principal
-    passes_consecutivos = 0
-    num_jogadores = len(lista_jogadores)
-    fim_jogo = False
+    # Main Loop
+    consecutive_passes = 0
+    num_players = len(players_list)
+    game_over = False
 
     
-    while not fim_jogo:
-        for i in range(num_jogadores):
+    while not game_over:
+        for i in range(num_players):
             
-            #Interromper o jogo devido ao número de 'passo'
-            if passes_consecutivos >= num_jogadores:
-                fim_jogo = True
+            # Interrupt game based on pass count
+            if consecutive_passes >= num_players:
+                game_over = True
                 break
             
             
-             # Imprimir tabuleiro
-            print(tabuleiro_para_str(tabuleiro), '\n')
+             # Print board
+            print(board_to_str(board), '\n')
             
-            # Imprimir status dos jogadores
-            for jogador in lista_jogadores:
-                print(jogador_para_str(jogador))
+            # Print player status
+            for player in players_list:
+                print(player_to_str(player))
             
             print()
             
-            jogador = lista_jogadores[i]
+            player = players_list[i]
             
             
             
-            # Jogada
-            nome = jogador_identidade(jogador)
+            # Turn
+            name = player_identity(player)
             
-            if eh_agente(jogador):
-                resultado = jogada_agente(tabuleiro, jogador, vocabulario, pilha)
-            elif eh_humano(jogador):
-                resultado = jogada_humano(tabuleiro, jogador, vocabulario, pilha)
+            if is_agent(player):
+                result = agent_move(board, player, vocabulary, sack)
+            elif is_human(player):
+                result = human_move(board, player, vocabulary, sack)
             
-            # Verificar se o jogador passou
-            if resultado is False:
-                passes_consecutivos += 1
+            # Check if player passed
+            if result is False:
+                consecutive_passes += 1
             else:
-                passes_consecutivos = 0
+                consecutive_passes = 0
                 
-            #Verificar se jogador ficou sem letras e o saco está vazio
-            if len(jogador_letras(jogador)) == 0 and len(pilha) == 0:
-                fim_jogo = True
+            # Check if player ran out of letters and sack is empty
+            if len(player_letters(player)) == 0 and len(sack) == 0:
+                game_over = True
                 break
     
-    # Cálculo das pontuações finais
-    pontuacoes_finais = tuple(jogador_pontos(jogador) for jogador in lista_jogadores)
+    # Final score calculation
+    final_scores = tuple(player_points(player) for player in players_list)
     
-    return pontuacoes_finais
+    return final_scores
     
 
 #endregion
 
 
-#region Funções Acessórias
-def adicionar_caracter(cadeia, caracter):
+# endregion
+
+
+#region Helper Functions
+
+def add_character(text_str, char):
     """
-    Separa os caracteres de uma string com espaços
-    
-    adicionar_espaços: {str} -> {str}
+    @brief Inserts a character between every character in a string.
+    @param text_str Original string.
+    @param char Character to insert.
+    @return Modified string.
     """
     index = 0
-    while index <= len(cadeia) -1:
-        #Obeter parte da cadeia até ao elemento anterior ao índice,
-        #adicionar um espaço, adicionar o resto da cadeia
-        cadeia = cadeia[0:index:1] + f"{caracter}" + cadeia[index : len(cadeia) : 1]
+    while index <= len(text_str) -1:
+        # Get substring up to index, add character, then append rest
+        text_str = text_str[0:index:1] + f"{char}" + text_str[index : len(text_str) : 1]
         index += 2
-    return cadeia
+    return text_str
 
 
-def chave(palavra):
+def key_func(word):
     """
-    Função utilizada como chave para a função sorted, de forma a ordenar 
-    lexicograficamente as palavras.
+    @brief Sort key for lexicographical ordering of Scrabble words.
+    @param word Word string.
+    @return List of priority values.
+    """
     
-    chave: {str} -> {int}
-    """
+    alphabet = 'A B C Ç D E F G H I J L M N O P Q R S T U V X Z'.split()
+    # Create priority dictionary
+    priority = {letter: i for i, letter in enumerate(alphabet)}
     
-    alfabeto = 'A B C Ç D E F G H I J L M N O P Q R S T U V X Z'.split()
-    # Criar um dicionário de prioridade
-    prioridade = {letra: i for i, letra in enumerate(alfabeto)}
-    
-    return [prioridade[letra] for letra in palavra]
+    return [priority[letter] for letter in word]
 
 
-def filtro_caracteres(ch):
+def character_filter(ch):
     """
-    Função acessória para filtrar os elementos de cada linha do tabuleiro
-
-    filtro_linhas: {str} -> {bool}
+    @brief Filter function for board line elements.
+    @param ch Character to evaluate.
+    @return True if character should be kept, False if it's a delimiter.
     """
 
-    if ch in ["[", "]", ","]:   #Se o caractere em análise estiver nesta lista, remove-o
+    if ch in ["[", "]", ","]:   # If character is in this list, remove it
         return False
     else:
         return True
 
 
-def elementos_conjunto(conj):
+def set_elements(collection):
     """
-    Primeiro cria-se uma lista com todas as chaves. Depois, percorre-se essa
-    lista e, para cada chave (letra), adiciona-se ao conjunto a letra um número
-    vezes correspondente ao valor associado à chave (ocorrências). Por fim, a
-    lista é ordenada.
-
-    elementos_conjunto: {dict} -> {str}
+    @brief Converts a letter frequency dictionary into a sorted string of elements.
+    @param collection Dictionary of {letter: count}.
+    @return Sorted string of all elements.
     """
 
-    chaves = list(conj.keys())
-    conjunto = ''
+    keys = list(collection.keys())
+    elements = ''
 
-    for letra in chaves:
-        occ = conj[letra]
+    for letter in keys:
+        occ = collection[letter]
         for i in range(occ):
-            conjunto += ''.join(letra)
+            elements += ''.join(letter)
 
-    conjunto = sorted(conjunto, key=chave)  # Utiliza a função previamente definida para a ordenação
+    elements = sorted(elements, key=key_func)  # Use custom sort key defined above
 
-    return conjunto
+    return elements
 
-def permuta_letras(letras, estado):
+def permute_letters(letters, state):
     """
-    Permuta uma sequência recorrendo a um algoritmo de Fisher-Yates. Para gerar
-    os números aleatórios dentro do intervalo desejado, recorre-se à função
-    gera_numero_aleatorio(). Devolve ainda o último número aleatório gerado.
-
-    permuta_letras: {list, int} -> {}
+    @brief Permutes a sequence using the Fisher-Yates algorithm.
+    @param letters List of letters to permute (destructive).
+    @param state Random generator state.
     """
 
-    n = len(letras)
+    n = len(letters)
     for i in range(n - 1, 0, -1):
-        estado = gera_numero_aleatorio(estado)
-        j = estado % (i + 1)
-        letras[j], letras[i] = letras[i], letras[j]
+        state = generate_random_number(state)
+        j = state % (i + 1)
+        letters[j], letters[i] = letters[i], letters[j]
         
 
-def gera_numero_aleatorio(estado):
+def generate_random_number(state):
     """
-    Utiliza o layout fornecido no enunciado para gerar um número pseudo-aleatório.
-
-    xorshift32: {int} -> {int}
+    @brief Generates a pseudo-random number using the xorshift32 algorithm.
+    @param state Current generator state.
+    @return Next pseudo-random number.
     """
 
-    estado ^= (estado << 13) & 0xFFFFFFFF
-    estado ^= (estado >> 17) & 0xFFFFFFFF
-    estado ^= (estado << 5) & 0xFFFFFFFF
+    state ^= (state << 13) & 0xFFFFFFFF
+    state ^= (state >> 17) & 0xFFFFFFFF
+    state ^= (state << 5) & 0xFFFFFFFF
 
-    return estado & 0xFFFFFFFF
+    return state & 0xFFFFFFFF
 
 #endregion
 
@@ -1439,10 +1385,10 @@ def gera_numero_aleatorio(estado):
 
 
 
-# Exemplo de Jogo
+# Game Example
 
-jog = ('Leticia', '@MEDIO', '@DIFICIL', )
+players_list = ('Leticia', '@MEDIO', '@DIFICIL', )
 
-scrabble2(jog, 'vocab25k.txt', 32)
+final_scores = scrabble2(players_list, 'vocab25k.txt', 32)
 
-print(f"\nO jogo terminou. Pontuações: {pontuacoes_finais}\n")
+print(f"\nThe game has ended. Final Scores: {final_scores}\n")
